@@ -1,16 +1,16 @@
 <template>
   <div>
-    <HomePage />
+    <ButtonAtom label="USD" />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
-import HomePage from './pages/HomePage.vue';
+import ButtonAtom from '../components/atoms/ButtonAtom.vue';
 
 export default Vue.extend({
   components: {
-    HomePage,
+    ButtonAtom,
   },
 });
 </script>
