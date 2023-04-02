@@ -79,7 +79,8 @@
 
 <script lang="ts">
 interface ButtonGroupProps {
-  list: { key: string; label: string };
+  key: string;
+  label: string;
 }
 
 import Vue from 'vue';
@@ -97,12 +98,7 @@ export default Vue.extend({
     this.setQuoteItems();
   },
   computed: {
-    ...mapGetters('quotes', [
-      'filteredQuoteItems',
-      'currencyList',
-      'yearList',
-      'displayList',
-    ]),
+    ...mapGetters('quotes', ['filteredQuoteItems', 'currencyList', 'yearList']),
     ...mapState('quotes', [
       'currencyFilter',
       'yearsFilter',
@@ -122,7 +118,7 @@ export default Vue.extend({
       }));
     },
     displayButtonList(): ButtonGroupProps[] {
-      return (this as any).displayList.map((display: string) => ({
+      return displayTypes.map((display: string) => ({
         key: display,
         label: display,
       }));

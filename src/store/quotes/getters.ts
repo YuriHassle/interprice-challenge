@@ -6,7 +6,6 @@ export interface Getters extends GetterTree<State, State> {
   filteredQuoteItems(state: State): QuoteItem[];
   currencyList(state: State): Array<string>;
   yearList(state: State): Array<number>;
-  displayList(): Array<string>;
 }
 
 const generateFilterListByProperty = (
@@ -65,8 +64,5 @@ export default {
       'Years'
     ) as Array<number>;
     return filteredArray.sort((a, b) => a - b);
-  },
-  displayList(): Array<string> {
-    return ['Spread', 'Yield', '3MLSpread'];
   },
 } as Getters;
