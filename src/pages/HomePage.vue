@@ -50,7 +50,7 @@
             {{
               row['years']?.[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
                 row.displayType
-              ] || ''
+              ] || '' | formatQuoteValue(displayFilter)
             }}
           </td>
         </tr>
@@ -62,7 +62,7 @@
             v-for="(average, index) in tableFooter"
             :key="`${index}-${average}`"
           >
-            {{ average ? average.toFixed(2) : '' }}
+            {{ average || '' | formatQuoteValue(displayFilter) }}
           </td>
         </tr>
       </tfoot>
