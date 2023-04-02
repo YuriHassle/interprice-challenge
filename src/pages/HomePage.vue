@@ -35,22 +35,29 @@
             v-for="(year, index) in tableSubHeaders"
             :key="`${index}-${year}`"
           >
-            {{ index % 2 === 0 ? 'FIX' : 'FRN' }}
+            {{ getCouponType(index) }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in tableData" :key="`${row.id}-${row.companyLabel}`">
+        <tr
+          v-for="(row, rowIndex) in tableData"
+          :key="`${row.id}-${row.companyLabel}`"
+        >
           <td>{{ row.dateSent }}</td>
           <td>{{ row.companyLabel }}</td>
           <td
-            v-for="(year, index) in tableSubHeaders"
-            :key="`${index}-${year}`"
+            v-for="(year, columnIndex) in tableSubHeaders"
+            :key="`${row.id}-${columnIndex}`"
+            :class="{
+              '--min-value':
+                getMinValueByColumn(columnIndex) ===
+                getQuoteValue(rowIndex, columnIndex),
+            }"
           >
             {{
-              row['years']?.[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
-                row.displayType
-              ] || '' | formatQuoteValue(displayFilter)
+              getQuoteValue(rowIndex, columnIndex) ||
+              '' | formatQuoteValue(row.displayType)
             }}
           </td>
         </tr>
@@ -162,22 +169,22 @@ export default Vue.extend({
     tableFooter(): any {
       const vm = this as any;
       const tableFooter = [] as any;
-      for (const [index, year] of vm.tableSubHeaders.entries()) {
+      for (const [columnIndex, year] of vm.tableSubHeaders.entries()) {
         let counter = 0;
-        const averageByYear = vm.tableData.reduce((acc: any, curr: any) => {
-          if (curr.displayType === vm.displayFilter) {
-            const value =
-              curr.years[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
-                vm.displayFilter
-              ];
-            if (value) {
-              acc += value;
-              counter++;
+        const totalByYear = vm.tableData.reduce(
+          (sum: number, data: any, rowIndex: number) => {
+            if (data.displayType === vm.displayFilter) {
+              const value = vm.getQuoteValue(rowIndex, columnIndex);
+              if (value) {
+                sum += value;
+                counter++;
+              }
             }
-          }
-          return acc;
-        }, 0);
-        tableFooter.push(counter ? averageByYear / counter : 0);
+            return sum;
+          },
+          0
+        );
+        tableFooter.push(counter ? totalByYear / counter : 0);
       }
 
       return tableFooter;
@@ -203,8 +210,43 @@ export default Vue.extend({
       'setDisplayFilter',
       'setCompanyNameFilter',
     ]),
+    getMinValueByColumn(columnIndex: number): number {
+      const vm = this as any;
+      const col = vm.tableSubHeaders[columnIndex];
+      const couponType = vm.getCouponType(columnIndex);
+
+      const minValue = vm.tableData.reduce(
+        (findMinValue: number, data: any) => {
+          const value = data.years?.[col]?.[couponType]?.[vm.displayFilter];
+          if (value) {
+            findMinValue =
+              findMinValue === null || value < findMinValue
+                ? value
+                : findMinValue;
+          }
+          return findMinValue;
+        },
+        null
+      );
+      return minValue;
+    },
+    getCouponType(columnIndex: number): string {
+      return columnIndex % 2 === 0 ? 'FIX' : 'FRN';
+    },
+    getQuoteValue(rowIndex: number, columnIndex: number): string {
+      const vm = this as any;
+      const row = vm.tableData[rowIndex];
+      const col = vm.tableSubHeaders[columnIndex];
+      return row.years?.[col]?.[vm.getCouponType(columnIndex)]?.[
+        row.displayType
+      ];
+    },
   },
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.--min-value {
+  background-color: yellow;
+}
+</style>
