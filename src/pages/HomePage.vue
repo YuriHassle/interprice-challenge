@@ -2,14 +2,17 @@
   <div>
     <ButtonGroup
       :list="currencyButtonList"
+      :active="[currencyFilter]"
       @handleButtonGroupClick="(currency) => setCurrencyFilter(currency)"
     />
     <ButtonGroup
       :list="yearsButtonList"
+      :active="[...yearsFilter]"
       @handleButtonGroupClick="(year) => setYearsFilter(year)"
     />
     <ButtonGroup
       :list="displayButtonList"
+      :active="[displayFilter]"
       @handleButtonGroupClick="(display) => setDisplayFilter(display)"
     />
     <InputAtom
@@ -28,7 +31,7 @@ interface ButtonGroupProps {
 import Vue from 'vue';
 import ButtonGroup from '../components/molecules/ButtonGroup.vue';
 import InputAtom from '../components/atoms/InputAtom.vue';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default Vue.extend({
   data() {
@@ -43,6 +46,12 @@ export default Vue.extend({
       'currencyList',
       'yearList',
       'displayList',
+    ]),
+    ...mapState('quotes', [
+      'currencyFilter',
+      'yearsFilter',
+      'displayFilter',
+      'companyNameFilter',
     ]),
     currencyButtonList(): ButtonGroupProps[] {
       return (this as any).currencyList.map((currency: string) => ({

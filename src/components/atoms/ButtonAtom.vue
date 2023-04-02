@@ -28,4 +28,8 @@ export default Vue.extend({
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-label);
 }
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-label);
+}
 </style>
