@@ -11,7 +11,7 @@ export interface State {
 export default (): State => ({
   quoteItems: [],
   companyNameFilter: '',
-  currencyFilter: '',
-  displayFilter: '',
+  currencyFilter: 'USD',
+  displayFilter: 'Spread',
   yearsFilter: [],
 });

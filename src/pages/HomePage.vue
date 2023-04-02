@@ -1,13 +1,26 @@
 <template>
   <div>
-    <ButtonGroup :list="currencyList" />
-    <ButtonGroup :list="yearList" />
-    <ButtonGroup :list="displayList" />
+    <ButtonGroup
+      :list="currencyButtonList"
+      @handleButtonGroupClick="(currency) => setCurrencyFilter(currency)"
+    />
+    <ButtonGroup
+      :list="yearsButtonList"
+      @handleButtonGroupClick="(year) => setYearsFilter(year)"
+    />
+    <ButtonGroup
+      :list="displayButtonList"
+      @handleButtonGroupClick="(display) => setDisplayFilter(display)"
+    />
     {{ filteredQuoteItems }}
   </div>
 </template>
 
 <script lang="ts">
+interface ButtonGroupProps {
+  list: { key: string; label: string };
+}
+
 import Vue from 'vue';
 import ButtonGroup from '../components/molecules/ButtonGroup.vue';
 import { mapActions, mapGetters } from 'vuex';
@@ -17,9 +30,7 @@ export default Vue.extend({
     return {};
   },
   mounted() {
-    this.setYearsFilter([2019, 2020]);
     this.setQuoteItems();
-    this.setCurrencyFilter('USD');
   },
   computed: {
     ...mapGetters('quotes', [
@@ -28,6 +39,24 @@ export default Vue.extend({
       'yearList',
       'displayList',
     ]),
+    currencyButtonList(): ButtonGroupProps[] {
+      return (this as any).currencyList.map((currency: string) => ({
+        key: currency,
+        label: currency,
+      }));
+    },
+    yearsButtonList(): ButtonGroupProps[] {
+      return (this as any).yearList.map((years: string) => ({
+        key: years,
+        label: `${years} YRS`,
+      }));
+    },
+    displayButtonList(): ButtonGroupProps[] {
+      return (this as any).displayList.map((display: string) => ({
+        key: display,
+        label: display,
+      }));
+    },
   },
   components: {
     ButtonGroup,

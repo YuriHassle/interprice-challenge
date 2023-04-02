@@ -1,9 +1,10 @@
 <template>
   <div class="button-group">
     <ButtonAtom
-      v-for="(label, index) in list"
-      :key="`${index}-${label}`"
+      v-for="{ label, key } in list"
+      :key="key"
       :label="label"
+      @handleButtonClick="$emit('handleButtonGroupClick', key)"
     />
   </div>
 </template>

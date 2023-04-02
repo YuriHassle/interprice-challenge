@@ -5,7 +5,7 @@ import type { GetterTree } from 'vuex';
 export interface Getters extends GetterTree<State, State> {
   filteredQuoteItems(state: State): QuoteItem[];
   currencyList(state: State): Array<string>;
-  yearList(state: State): Array<string>;
+  yearList(state: State): Array<number>;
   displayList(): Array<string>;
 }
 
@@ -37,13 +37,12 @@ export default {
       Currency === currencyFilter;
     const filterByYears = ({ Years }: Quote) => yearsFilter.includes(Years);
 
-    const filteredQuoteItems = companyNameFilter
+    const quoteItemsFilteredByName = companyNameFilter
       ? [...quoteItems.filter(filterByCompanyName)]
       : quoteItems;
 
-    console.log('test', filteredQuoteItems);
-
-    for (const item of filteredQuoteItems) {
+    const filteredQuoteItems = [];
+    for (const item of quoteItemsFilteredByName) {
       const filteredQuotes =
         item.Quote?.filter(filterByCurrency).filter(filterByYears) || null;
 
@@ -58,10 +57,8 @@ export default {
       'Currency'
     ) as Array<string>;
   },
-  yearList({ quoteItems }): Array<string> {
-    const list = generateFilterListByProperty(quoteItems, 'Years');
-
-    return list.map((year) => `${year} YRS`);
+  yearList({ quoteItems }): Array<number> {
+    return generateFilterListByProperty(quoteItems, 'Years') as Array<number>;
   },
   displayList(): Array<string> {
     return ['Spread', 'Yield', '3MLSpread'];
