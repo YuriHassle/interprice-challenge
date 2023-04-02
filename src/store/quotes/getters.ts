@@ -60,7 +60,11 @@ export default {
     ) as Array<string>;
   },
   yearList({ quoteItems }): Array<number> {
-    return generateFilterListByProperty(quoteItems, 'Years') as Array<number>;
+    const filteredArray = generateFilterListByProperty(
+      quoteItems,
+      'Years'
+    ) as Array<number>;
+    return filteredArray.sort((a, b) => a - b);
   },
   displayList(): Array<string> {
     return ['Spread', 'Yield', '3MLSpread'];

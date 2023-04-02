@@ -19,7 +19,43 @@
       placeholder="Filter by company name..."
       @handleInput="(name) => setCompanyNameFilter(name)"
     />
-    {{ filteredQuoteItems }}
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th colspan="2" v-for="year in yearsFilter" :key="year">
+            {{ year }} YRS
+          </th>
+        </tr>
+        <tr>
+          <th>DATE SENT</th>
+          <th>COMPANY</th>
+          <th
+            v-for="(year, index) in tableSubHeaders"
+            :key="`${index}-${year}`"
+          >
+            {{ index % 2 === 0 ? 'FIX' : 'FRN' }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in tableData" :key="row.id">
+          <td>{{ row.dateSent }}</td>
+          <td>{{ row.companyName }}</td>
+          <td
+            v-for="(year, index) in tableSubHeaders"
+            :key="`${index}-${year}`"
+          >
+            {{
+              row['years']?.[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
+                displayFilter
+              ] || ''
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -32,6 +68,7 @@ import Vue from 'vue';
 import ButtonGroup from '../components/molecules/ButtonGroup.vue';
 import InputAtom from '../components/atoms/InputAtom.vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
+import type { Quote } from '../models/Quote';
 
 export default Vue.extend({
   data() {
@@ -70,6 +107,36 @@ export default Vue.extend({
         key: display,
         label: display,
       }));
+    },
+    tableData(): any {
+      const vm = this as any;
+      const tableData = [] as any;
+      for (const quoteItem of vm.filteredQuoteItems) {
+        const quotesGroupedByYear = {} as any;
+        quoteItem.Quote?.forEach((quote: Quote) => {
+          if (!quotesGroupedByYear[quote.Years]) {
+            quotesGroupedByYear[quote.Years] = {};
+          }
+          quotesGroupedByYear[quote.Years][quote.CouponType] = quote;
+        });
+
+        tableData.push({
+          id: quoteItem.Id,
+          dateSent: quoteItem.DateSent,
+          companyName: quoteItem.Company,
+          years: { ...quotesGroupedByYear },
+        });
+      }
+      console.log('tableData', tableData);
+      return tableData;
+    },
+    tableSubHeaders(): Array<number> {
+      const vm = this as any;
+      const tableSubHeaders = [] as Array<number>;
+      vm.yearsFilter.forEach((year: number) =>
+        tableSubHeaders.push(year, year)
+      );
+      return tableSubHeaders;
     },
   },
   components: {

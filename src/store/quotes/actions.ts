@@ -35,6 +35,8 @@ export default {
     const newArray = yearsFilter.includes(year)
       ? yearsFilter.filter((y) => y !== year)
       : [...yearsFilter, year];
+
+    newArray.sort((a, b) => a - b);
     commit(MutationType.SET_YEARS_FILTER, newArray);
   },
 } as Actions;
