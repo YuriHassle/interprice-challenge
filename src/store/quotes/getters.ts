@@ -32,7 +32,9 @@ export default {
       state;
 
     const filterByCompanyName = ({ Company }: QuoteItem) =>
-      Company.includes(companyNameFilter);
+      Company.toLocaleLowerCase().includes(
+        companyNameFilter.toLocaleLowerCase()
+      );
     const filterByCurrency = ({ Currency }: Quote) =>
       Currency === currencyFilter;
     const filterByYears = ({ Years }: Quote) => yearsFilter.includes(Years);

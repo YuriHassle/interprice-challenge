@@ -12,6 +12,10 @@
       :list="displayButtonList"
       @handleButtonGroupClick="(display) => setDisplayFilter(display)"
     />
+    <InputAtom
+      placeholder="Filter by company name..."
+      @handleInput="(name) => setCompanyNameFilter(name)"
+    />
     {{ filteredQuoteItems }}
   </div>
 </template>
@@ -23,6 +27,7 @@ interface ButtonGroupProps {
 
 import Vue from 'vue';
 import ButtonGroup from '../components/molecules/ButtonGroup.vue';
+import InputAtom from '../components/atoms/InputAtom.vue';
 import { mapActions, mapGetters } from 'vuex';
 
 export default Vue.extend({
@@ -60,6 +65,7 @@ export default Vue.extend({
   },
   components: {
     ButtonGroup,
+    InputAtom,
   },
   methods: {
     ...mapActions('quotes', [
@@ -67,6 +73,7 @@ export default Vue.extend({
       'setCurrencyFilter',
       'setYearsFilter',
       'setDisplayFilter',
+      'setCompanyNameFilter',
     ]),
   },
 });
