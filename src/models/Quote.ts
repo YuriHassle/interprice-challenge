@@ -1,4 +1,4 @@
-export interface Item {
+export interface QuoteItem {
   Id: string | null;
   DateSent: string | null;
   Company: string;
