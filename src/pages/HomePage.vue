@@ -55,6 +55,17 @@
           </td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Average by Spread</th>
+          <td
+            v-for="(average, index) in tableFooter"
+            :key="`${index}-${average}`"
+          >
+            {{ average ? average.toFixed(2) : '' }}
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </template>
@@ -147,6 +158,29 @@ export default Vue.extend({
       }
       console.log('tableData', tableData);
       return tableData;
+    },
+    tableFooter(): any {
+      const vm = this as any;
+      const tableFooter = [] as any;
+      for (const [index, year] of vm.tableSubHeaders.entries()) {
+        let counter = 0;
+        const averageByYear = vm.tableData.reduce((acc: any, curr: any) => {
+          if (curr.displayType === vm.displayFilter) {
+            const value =
+              curr.years[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
+                vm.displayFilter
+              ];
+            if (value) {
+              acc += value;
+              counter++;
+            }
+          }
+          return acc;
+        }, 0);
+        tableFooter.push(counter ? averageByYear / counter : 0);
+      }
+
+      return tableFooter;
     },
     tableSubHeaders(): Array<number> {
       const vm = this as any;
