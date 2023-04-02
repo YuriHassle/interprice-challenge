@@ -1,4 +1,4 @@
-import type { QuoteItem } from '../models/Quote';
+import type { QuoteItem } from '../../models/Quote';
 
 export interface State {
   quoteItems: QuoteItem[];

@@ -20,7 +20,7 @@ export default Vue.extend({
     this.loadQuoteItems();
   },
   computed: {
-    ...mapGetters([
+    ...mapGetters('quotes', [
       'filteredQuoteItems',
       'currencyList',
       'yearList',
@@ -31,7 +31,7 @@ export default Vue.extend({
     ButtonGroup,
   },
   methods: {
-    ...mapActions(['loadQuoteItems']),
+    ...mapActions('quotes', ['loadQuoteItems']),
   },
 });
 </script>

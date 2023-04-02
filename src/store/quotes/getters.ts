@@ -1,4 +1,4 @@
-import type { QuoteItem, Quote } from '../models/Quote';
+import type { QuoteItem, Quote } from '../../models/Quote';
 import type { State } from './state';
 import type { GetterTree } from 'vuex';
 

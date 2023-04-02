@@ -1,7 +1,7 @@
 import type { ActionTree, ActionContext } from 'vuex';
 import type { State } from './state';
-import quotesData from '../mock/data.json';
-import type { QuoteItem } from '../models/Quote';
+import quotesData from '../../mock/data.json';
+import type { QuoteItem } from '../../models/Quote';
 
 type Context = ActionContext<State, State>;
 
