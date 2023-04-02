@@ -17,3 +17,5 @@ export interface Quote {
 }
 
 export type CouponType = 'FIX' | 'FRN';
+
+export const displayTypes = ['Spread', 'Yield', '3MLSpread'];

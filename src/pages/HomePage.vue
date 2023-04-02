@@ -40,16 +40,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in tableData" :key="row.id">
+        <tr v-for="row in tableData" :key="`${row.id}-${row.companyLabel}`">
           <td>{{ row.dateSent }}</td>
-          <td>{{ row.companyName }}</td>
+          <td>{{ row.companyLabel }}</td>
           <td
             v-for="(year, index) in tableSubHeaders"
             :key="`${index}-${year}`"
           >
             {{
               row['years']?.[year]?.[index % 2 === 0 ? 'FIX' : 'FRN']?.[
-                displayFilter
+                row.displayType
               ] || ''
             }}
           </td>
@@ -69,6 +69,7 @@ import ButtonGroup from '../components/molecules/ButtonGroup.vue';
 import InputAtom from '../components/atoms/InputAtom.vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 import type { Quote } from '../models/Quote';
+import { displayTypes } from '../models/Quote';
 
 export default Vue.extend({
   data() {
@@ -113,19 +114,36 @@ export default Vue.extend({
       const tableData = [] as any;
       for (const quoteItem of vm.filteredQuoteItems) {
         const quotesGroupedByYear = {} as any;
-        quoteItem.Quote?.forEach((quote: Quote) => {
-          if (!quotesGroupedByYear[quote.Years]) {
-            quotesGroupedByYear[quote.Years] = {};
-          }
-          quotesGroupedByYear[quote.Years][quote.CouponType] = quote;
-        });
 
-        tableData.push({
-          id: quoteItem.Id,
-          dateSent: quoteItem.DateSent,
-          companyName: quoteItem.Company,
-          years: { ...quotesGroupedByYear },
-        });
+        const isQuotesNull = quoteItem.Quote === null;
+
+        if (!isQuotesNull) {
+          quoteItem.Quote.forEach((quote: Quote) => {
+            if (!quotesGroupedByYear[quote.Years]) {
+              quotesGroupedByYear[quote.Years] = {};
+            }
+            quotesGroupedByYear[quote.Years][quote.CouponType] = quote;
+          });
+
+          displayTypes.forEach((displayType: string) => {
+            const isSelectedDisplayType = displayType === vm.displayFilter;
+            tableData.push({
+              id: quoteItem.Id,
+              dateSent: isSelectedDisplayType ? quoteItem.DateSent : '',
+              companyLabel: isSelectedDisplayType
+                ? quoteItem.Company
+                : displayType,
+              displayType,
+              years: { ...quotesGroupedByYear },
+            });
+          });
+        } else {
+          tableData.push({
+            id: quoteItem.Id,
+            dateSent: quoteItem.DateSent,
+            companyLabel: quoteItem.Company,
+          });
+        }
       }
       console.log('tableData', tableData);
       return tableData;
