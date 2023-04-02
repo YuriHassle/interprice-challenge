@@ -17,7 +17,9 @@ export default Vue.extend({
     return {};
   },
   mounted() {
-    this.loadQuoteItems();
+    this.setYearsFilter([2019, 2020]);
+    this.setQuoteItems();
+    this.setCurrencyFilter('USD');
   },
   computed: {
     ...mapGetters('quotes', [
@@ -31,7 +33,12 @@ export default Vue.extend({
     ButtonGroup,
   },
   methods: {
-    ...mapActions('quotes', ['loadQuoteItems']),
+    ...mapActions('quotes', [
+      'setQuoteItems',
+      'setCurrencyFilter',
+      'setYearsFilter',
+      'setDisplayFilter',
+    ]),
   },
 });
 </script>

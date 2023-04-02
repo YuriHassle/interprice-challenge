@@ -41,6 +41,8 @@ export default {
       ? [...quoteItems.filter(filterByCompanyName)]
       : quoteItems;
 
+    console.log('test', filteredQuoteItems);
+
     for (const item of filteredQuoteItems) {
       const filteredQuotes =
         item.Quote?.filter(filterByCurrency).filter(filterByYears) || null;
