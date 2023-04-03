@@ -13,10 +13,10 @@
           <th>
             <span> DATE SENT </span>
             <i
-              class="sort-button bi"
+              class="table__sort-button bi"
               :class="[
                 {
-                  'sort-button--active': sortBy.property === 'dateSent',
+                  'table__sort-button--active': sortBy.property === 'dateSent',
                 },
                 {
                   'bi-caret-down-fill':
@@ -34,10 +34,11 @@
           <th>
             <span> COMPANY </span>
             <i
-              class="sort-button bi"
+              class="table__sort-button bi"
               :class="[
                 {
-                  'sort-button--active': sortBy.property === 'company',
+                  'table__sort-button--active':
+                    sortBy.property === 'companyName',
                 },
                 {
                   'bi-caret-down-fill':
@@ -72,7 +73,7 @@
           <td class="table__cell">
             <i
               v-if="isSelectedDisplayType(row.displayType)"
-              class="bi"
+              class="table__dropdown-button bi"
               :class="
                 hiddenRows.includes(rowIndex + 1)
                   ? 'bi-chevron-right'
@@ -188,18 +189,14 @@ export default Vue.extend({
         }
       }
 
-      const sortByPreferred = (a: any, b: any) => {
-        return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
-      };
-
       const sortMethod = {
         dateSent: this.sortByDate,
         companyName: this.sortByCompanyName,
       };
 
       const sortedTable = tableData
-        .sort(sortByPreferred)
-        ?.sort((a: any, b: any) =>
+        .sort(this.sortByPreferred)
+        .sort((a: any, b: any) =>
           sortMethod[this.sortBy.property as keyof typeof sortMethod](
             a,
             b,
@@ -290,7 +287,9 @@ export default Vue.extend({
     isSelectedDisplayType(displayType: string) {
       return displayType === (this as any).displayFilter;
     },
-
+    sortByPreferred(a: any, b: any) {
+      return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
+    },
     sortByDate(a: any, b: any, desc: boolean) {
       const dateA = new Date(a.dateSent).getTime();
       const dateB = new Date(b.dateSent).getTime();
@@ -346,6 +345,14 @@ export default Vue.extend({
   }
   &__footer {
     border: 0.14rem solid var(--table-primary-color);
+  }
+  &__sort-button {
+    &--active {
+      color: var(--black);
+    }
+  }
+  &__dropdown-button {
+    font-size: 1.1rem;
   }
 }
 </style>
