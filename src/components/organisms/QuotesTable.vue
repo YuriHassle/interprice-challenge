@@ -24,9 +24,37 @@
         <tr
           v-for="(row, rowIndex) in tableData"
           :key="`${row.id}-${row.companyLabel}`"
+          class="table__row"
+          :class="{
+            'table__row--hidden': hiddenRows.includes(rowIndex),
+          }"
         >
-          <td class="table__cell">{{ row.dateSent }}</td>
-          <td class="table__cell">{{ row.companyLabel }}</td>
+          <td class="table__cell">
+            <i
+              v-if="row.dateSent"
+              class="bi"
+              :class="
+                hiddenRows.includes(rowIndex + 1)
+                  ? 'bi-chevron-right'
+                  : 'bi-chevron-down'
+              "
+              @click="handleDropdownClick(rowIndex)"
+            />
+            {{ row.dateSent }}
+          </td>
+          <td
+            class="table__cell"
+            :class="[
+              {
+                'table__cell--primary': row.displayType === displayFilter,
+              },
+              {
+                'table__cell--disabled': !row.years,
+              },
+            ]"
+          >
+            {{ row.companyLabel }}
+          </td>
           <td
             class="table__cell"
             v-for="(year, columnIndex) in tableSubHeaders"
@@ -67,7 +95,9 @@ import { displayTypes } from '../../models/Quote';
 
 export default Vue.extend({
   data() {
-    return {};
+    return {
+      hiddenRows: [] as Array<number>,
+    };
   },
   computed: {
     ...mapGetters('quotes', ['filteredQuoteItems']),
@@ -175,6 +205,14 @@ export default Vue.extend({
         row.displayType
       ];
     },
+    handleDropdownClick(rowIndex: number) {
+      const rowsToEvaluate = [rowIndex + 1, rowIndex + 2];
+      this.hiddenRows = this.hiddenRows.some((row) =>
+        rowsToEvaluate.includes(row)
+      )
+        ? this.hiddenRows.filter((key: number) => !rowsToEvaluate.includes(key))
+        : [...this.hiddenRows, ...rowsToEvaluate];
+    },
   },
 });
 </script>
@@ -195,9 +233,21 @@ export default Vue.extend({
       border-top-color: var(--table-primary-color);
     }
   }
+  &__row {
+    &--hidden {
+      display: none;
+    }
+  }
   &__cell {
     &--min-value {
       background-color: var(--highlight-color);
+    }
+    &--primary {
+      font-weight: bold;
+    }
+    &--disabled {
+      color: var(--table-cell-disabled);
+      font-weight: bold;
     }
   }
 }
