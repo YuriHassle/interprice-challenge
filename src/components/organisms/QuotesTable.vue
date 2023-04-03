@@ -82,7 +82,11 @@
               @click="handleDropdownClick(rowIndex)"
             />
             <span>
-              {{ isSelectedDisplayType(row.displayType) ? row.dateSent : '' }}
+              {{
+                isSelectedDisplayType(row.displayType)
+                  ? row.dateSent
+                  : '' | formatDate
+              }}
             </span>
           </td>
           <td

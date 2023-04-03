@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
+import format from 'date-fns/format';
 
 Vue.filter('formatQuoteValue', function (value: number, displayType: string) {
   switch (displayType) {
@@ -13,6 +14,14 @@ Vue.filter('formatQuoteValue', function (value: number, displayType: string) {
       return value;
   }
 });
+
+Vue.filter(
+  'formatDate',
+  function (value: string, formatAs = 'dd/MMM/yy' as string) {
+    if (!value) return value;
+    return format(new Date(`${value}T00:00`), formatAs);
+  }
+);
 
 new Vue({
   store,
