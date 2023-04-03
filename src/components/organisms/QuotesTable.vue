@@ -10,8 +10,48 @@
           </th>
         </tr>
         <tr>
-          <th>DATE SENT</th>
-          <th>COMPANY</th>
+          <th>
+            <span> DATE SENT </span>
+            <i
+              class="sort-button bi"
+              :class="[
+                {
+                  'sort-button--active': sortBy.property === 'dateSent',
+                },
+                {
+                  'bi-caret-down-fill':
+                    sortBy.property === 'dateSent' && sortBy.desc,
+                },
+                {
+                  'bi-caret-up-fill':
+                    (sortBy.property === 'dateSent' && !sortBy.desc) ||
+                    sortBy.property !== 'dateSent',
+                },
+              ]"
+              @click="handleSortClick('dateSent')"
+            />
+          </th>
+          <th>
+            <span> COMPANY </span>
+            <i
+              class="sort-button bi"
+              :class="[
+                {
+                  'sort-button--active': sortBy.property === 'company',
+                },
+                {
+                  'bi-caret-down-fill':
+                    sortBy.property === 'companyName' && sortBy.desc,
+                },
+                {
+                  'bi-caret-up-fill':
+                    (sortBy.property === 'companyName' && !sortBy.desc) ||
+                    sortBy.property !== 'companyName',
+                },
+              ]"
+              @click="handleSortClick('companyName')"
+            />
+          </th>
           <th
             v-for="(year, index) in tableSubHeaders"
             :key="`${index}-${year}`"
@@ -23,7 +63,7 @@
       <tbody class="table__body table-group-divider">
         <tr
           v-for="(row, rowIndex) in tableData"
-          :key="`${row.id}-${row.companyLabel}`"
+          :key="`${row.id}-${rowIndex}`"
           class="table__row"
           :class="{
             'table__row--hidden': hiddenRows.includes(rowIndex),
@@ -31,7 +71,7 @@
         >
           <td class="table__cell">
             <i
-              v-if="row.dateSent"
+              v-if="isSelectedDisplayType(row.displayType)"
               class="bi"
               :class="
                 hiddenRows.includes(rowIndex + 1)
@@ -40,20 +80,26 @@
               "
               @click="handleDropdownClick(rowIndex)"
             />
-            {{ row.dateSent }}
+            <span>
+              {{ isSelectedDisplayType(row.displayType) ? row.dateSent : '' }}
+            </span>
           </td>
           <td
             class="table__cell"
             :class="[
               {
-                'table__cell--primary': row.displayType === displayFilter,
+                'table__cell--primary': isSelectedDisplayType(row.displayType),
               },
               {
                 'table__cell--disabled': !row.years,
               },
             ]"
           >
-            {{ row.companyLabel }}
+            {{
+              isSelectedDisplayType(row.displayType) || !row.years
+                ? row.companyName
+                : row.displayType
+            }}
           </td>
           <td
             class="table__cell"
@@ -72,7 +118,7 @@
           </td>
         </tr>
       </tbody>
-      <tfoot>
+      <tfoot class="table__footer">
         <tr>
           <th colspan="2">Average by Spread</th>
           <td
@@ -97,6 +143,10 @@ export default Vue.extend({
   data() {
     return {
       hiddenRows: [] as Array<number>,
+      sortBy: {
+        property: 'dateSent',
+        desc: true,
+      },
     };
   },
   computed: {
@@ -119,14 +169,12 @@ export default Vue.extend({
           });
 
           displayTypes.forEach((displayType: string) => {
-            const isSelectedDisplayType = displayType === vm.displayFilter;
             tableData.push({
               id: quoteItem.Id,
-              dateSent: isSelectedDisplayType ? quoteItem.DateSent : '',
-              companyLabel: isSelectedDisplayType
-                ? quoteItem.Company
-                : displayType,
+              dateSent: quoteItem.DateSent,
+              companyName: quoteItem.Company,
               displayType,
+              preferred: quoteItem.Preferred,
               years: { ...quotesGroupedByYear },
             });
           });
@@ -135,11 +183,31 @@ export default Vue.extend({
             id: quoteItem.Id,
             dateSent: quoteItem.DateSent,
             companyLabel: quoteItem.Company,
+            companyName: quoteItem.Company,
           });
         }
       }
-      console.log('tableData', tableData);
-      return tableData;
+
+      const sortByPreferred = (a: any, b: any) => {
+        return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
+      };
+
+      const sortMethod = {
+        dateSent: this.sortByDate,
+        companyName: this.sortByCompanyName,
+      };
+
+      const sortedTable = tableData
+        .sort(sortByPreferred)
+        ?.sort((a: any, b: any) =>
+          sortMethod[this.sortBy.property as keyof typeof sortMethod](
+            a,
+            b,
+            this.sortBy.desc
+          )
+        );
+      console.log('tableData', sortedTable);
+      return sortedTable;
     },
     tableFooter(): any {
       const vm = this as any;
@@ -148,7 +216,7 @@ export default Vue.extend({
         let counter = 0;
         const totalByYear = vm.tableData.reduce(
           (sum: number, data: any, rowIndex: number) => {
-            if (data.displayType === vm.displayFilter) {
+            if (this.isSelectedDisplayType(data.displayType)) {
               const value = vm.getQuoteValue(rowIndex, columnIndex);
               if (value) {
                 sum += value;
@@ -213,6 +281,32 @@ export default Vue.extend({
         ? this.hiddenRows.filter((key: number) => !rowsToEvaluate.includes(key))
         : [...this.hiddenRows, ...rowsToEvaluate];
     },
+    handleSortClick(property: string) {
+      this.sortBy = {
+        property,
+        desc: this.sortBy.property === property ? !this.sortBy.desc : true,
+      };
+    },
+    isSelectedDisplayType(displayType: string) {
+      return displayType === (this as any).displayFilter;
+    },
+
+    sortByDate(a: any, b: any, desc: boolean) {
+      const dateA = new Date(a.dateSent).getTime();
+      const dateB = new Date(b.dateSent).getTime();
+      return (
+        Number(!a.years) - Number(!b.years) ||
+        (desc ? dateB - dateA : dateA - dateB)
+      );
+    },
+    sortByCompanyName(a: any, b: any, desc: boolean) {
+      return (
+        Number(!a.years) - Number(!b.years) ||
+        (desc
+          ? a.companyName.localeCompare(b.companyName)
+          : b.companyName.localeCompare(a.companyName))
+      );
+    },
   },
 });
 </script>
@@ -249,6 +343,9 @@ export default Vue.extend({
       color: var(--table-cell-disabled);
       font-weight: bold;
     }
+  }
+  &__footer {
+    border: 0.14rem solid var(--table-primary-color);
   }
 }
 </style>
