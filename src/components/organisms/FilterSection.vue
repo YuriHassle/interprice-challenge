@@ -81,6 +81,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+@import 'node_modules/bootstrap/scss/functions';
+@import 'node_modules/bootstrap/scss/variables';
+@import 'node_modules/bootstrap/scss/mixins';
+
 .filters {
   display: flex;
   flex-direction: column;
@@ -88,11 +92,22 @@ export default Vue.extend({
 
   &__button-container {
     display: flex;
+    flex-direction: column;
     gap: 2rem;
   }
 
   &__input {
-    width: 40%;
+    width: 100%;
+  }
+
+  @include media-breakpoint-up(md) {
+    &__button-container {
+      flex-direction: row;
+    }
+
+    &__input {
+      width: 40%;
+    }
   }
 }
 </style>
