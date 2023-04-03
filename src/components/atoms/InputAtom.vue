@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <label v-if="label" for="input">{{ label }}</label>
+  <div class="input-container">
+    <label v-if="label" for="input" class="form-label">{{ label }}</label>
     <input
       id="input"
-      class="input"
+      class="form-control"
       v-bind="$attrs"
       @input="$emit('handleInput', $event.target.value)"
     />
@@ -27,4 +27,4 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

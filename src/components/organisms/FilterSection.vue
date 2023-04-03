@@ -1,21 +1,24 @@
 <template>
-  <section>
-    <ButtonGroup
-      :list="currencyButtonList"
-      :active="[currencyFilter]"
-      @handleButtonGroupClick="(currency) => setCurrencyFilter(currency)"
-    />
-    <ButtonGroup
-      :list="yearsButtonList"
-      :active="[...yearsFilter]"
-      @handleButtonGroupClick="(year) => setYearsFilter(year)"
-    />
-    <ButtonGroup
-      :list="displayButtonList"
-      :active="[displayFilter]"
-      @handleButtonGroupClick="(display) => setDisplayFilter(display)"
-    />
+  <section class="filters">
+    <div class="filters__button-container">
+      <ButtonGroup
+        :list="currencyButtonList"
+        :active="[currencyFilter]"
+        @handleButtonGroupClick="(currency) => setCurrencyFilter(currency)"
+      />
+      <ButtonGroup
+        :list="yearsButtonList"
+        :active="[...yearsFilter]"
+        @handleButtonGroupClick="(year) => setYearsFilter(year)"
+      />
+      <ButtonGroup
+        :list="displayButtonList"
+        :active="[displayFilter]"
+        @handleButtonGroupClick="(display) => setDisplayFilter(display)"
+      />
+    </div>
     <InputAtom
+      class="filters__input"
       placeholder="Filter by company name..."
       @handleInput="(name) => setCompanyNameFilter(name)"
     />
@@ -77,4 +80,19 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__button-container {
+    display: flex;
+    gap: 2rem;
+  }
+
+  &__input {
+    width: 40%;
+  }
+}
+</style>

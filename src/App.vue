@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <HomePage />
   </div>
 </template>
@@ -15,4 +15,8 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  padding-block: 1.5rem;
+}
+</style>

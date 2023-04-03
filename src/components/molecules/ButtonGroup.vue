@@ -5,7 +5,7 @@
       :key="key"
       :label="label"
       theme="secondary"
-      :class="{ 'btn--active': active.includes(key) }"
+      :class="{ 'button-group--active': active.includes(key) }"
       @handleButtonClick="$emit('handleButtonGroupClick', key)"
     />
   </div>
@@ -26,9 +26,21 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.btn--active {
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-label);
+<style scoped lang="scss">
+.button-group {
+  & button {
+    border-radius: 0;
+    &:first-child {
+      border-radius: 0.25rem 0 0 0.25rem;
+    }
+    &:last-child {
+      border-radius: 0 0.25rem 0.25rem 0;
+    }
+  }
+  &--active {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-label);
+    border-right-color: var(--white);
+  }
 }
 </style>

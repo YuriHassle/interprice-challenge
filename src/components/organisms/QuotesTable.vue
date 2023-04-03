@@ -1,56 +1,62 @@
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th colspan="2" v-for="year in yearsFilter" :key="year">
-          {{ year }} YRS
-        </th>
-      </tr>
-      <tr>
-        <th>DATE SENT</th>
-        <th>COMPANY</th>
-        <th v-for="(year, index) in tableSubHeaders" :key="`${index}-${year}`">
-          {{ getCouponType(index) }}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(row, rowIndex) in tableData"
-        :key="`${row.id}-${row.companyLabel}`"
-      >
-        <td>{{ row.dateSent }}</td>
-        <td>{{ row.companyLabel }}</td>
-        <td
-          v-for="(year, columnIndex) in tableSubHeaders"
-          :key="`${row.id}-${columnIndex}`"
-          :class="{
-            '--min-value':
-              getMinValueByColumn(columnIndex) ===
-              getQuoteValue(rowIndex, columnIndex),
-          }"
+  <div class="table-responsive">
+    <table class="table table-hover table-responsive">
+      <thead class="table__head">
+        <tr>
+          <th></th>
+          <th></th>
+          <th colspan="2" v-for="year in yearsFilter" :key="year">
+            {{ year }} YRS
+          </th>
+        </tr>
+        <tr>
+          <th>DATE SENT</th>
+          <th>COMPANY</th>
+          <th
+            v-for="(year, index) in tableSubHeaders"
+            :key="`${index}-${year}`"
+          >
+            {{ getCouponType(index) }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="table__body table-group-divider">
+        <tr
+          v-for="(row, rowIndex) in tableData"
+          :key="`${row.id}-${row.companyLabel}`"
         >
-          {{
-            getQuoteValue(rowIndex, columnIndex) ||
-            '' | formatQuoteValue(row.displayType)
-          }}
-        </td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <th colspan="2">Average by Spread</th>
-        <td
-          v-for="(average, index) in tableFooter"
-          :key="`${index}-${average}`"
-        >
-          {{ average || '' | formatQuoteValue(displayFilter) }}
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+          <td class="table__cell">{{ row.dateSent }}</td>
+          <td class="table__cell">{{ row.companyLabel }}</td>
+          <td
+            class="table__cell"
+            v-for="(year, columnIndex) in tableSubHeaders"
+            :key="`${row.id}-${columnIndex}`"
+            :class="{
+              'table__cell--min-value':
+                getMinValueByColumn(columnIndex) ===
+                getQuoteValue(rowIndex, columnIndex),
+            }"
+          >
+            {{
+              getQuoteValue(rowIndex, columnIndex) ||
+              '' | formatQuoteValue(row.displayType)
+            }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Average by Spread</th>
+          <td
+            v-for="(average, index) in tableFooter"
+            :key="`${index}-${average}`"
+          >
+            {{ average || '' | formatQuoteValue(displayFilter) }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -174,7 +180,25 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.--min-value {
-  background-color: yellow;
+.table {
+  &__head {
+    & th {
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      color: var(--subtitle-color);
+    }
+  }
+  &__body {
+    &.table-group-divider {
+      border-top-width: 0.14rem;
+      border-top-color: var(--table-primary-color);
+    }
+  }
+  &__cell {
+    &--min-value {
+      background-color: var(--highlight-color);
+    }
+  }
 }
 </style>
