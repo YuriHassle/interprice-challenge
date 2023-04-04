@@ -21,3 +21,5 @@ npm install
 ```bash
 npm run dev
 ```
+
+4. Check the project live on this **[link](https://interprice-challenge-yuri.vercel.app/)**
