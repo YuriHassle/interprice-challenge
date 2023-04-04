@@ -79,7 +79,7 @@
                   ? 'bi-chevron-right'
                   : 'bi-chevron-down'
               "
-              @click="handleDropdownClick(rowIndex)"
+              @click="handleDropdownClick(row)"
             />
             <span>
               {{
@@ -181,6 +181,7 @@ export default Vue.extend({
               displayType,
               preferred: quoteItem.Preferred,
               years: { ...quotesGroupedByYear },
+              isPrimaryRow: this.isSelectedDisplayType(displayType),
             });
           });
         } else {
@@ -193,19 +194,11 @@ export default Vue.extend({
         }
       }
 
-      const sortMethod = {
-        dateSent: this.sortByDate,
-        companyName: this.sortByCompanyName,
-      };
-
       const sortedTable = tableData
-        .sort(this.sortByPreferred)
+        .sort(this.sortByProperty('displayType'))
+        .sort(this.sortByProperty('preferred'))
         .sort((a: any, b: any) =>
-          sortMethod[this.sortBy.property as keyof typeof sortMethod](
-            a,
-            b,
-            this.sortBy.desc
-          )
+          this.sortByProperty(this.sortBy.property)(a, b, this.sortBy.desc)
         );
       console.log('tableData', sortedTable);
       return sortedTable;
@@ -274,8 +267,8 @@ export default Vue.extend({
         row.displayType
       ];
     },
-    handleDropdownClick(rowIndex: number) {
-      const rowsToEvaluate = [rowIndex + 1, rowIndex + 2];
+    handleDropdownClick(row: any) {
+      const rowsToEvaluate = this.findRelatedRowsIndexes(row);
       this.hiddenRows = this.hiddenRows.some((row) =>
         rowsToEvaluate.includes(row)
       )
@@ -291,23 +284,57 @@ export default Vue.extend({
     isSelectedDisplayType(displayType: string) {
       return displayType === (this as any).displayFilter;
     },
-    sortByPreferred(a: any, b: any) {
-      return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
+
+    sortByProperty(property: string) {
+      const sortByPreferred = (a: any, b: any) => {
+        return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
+      };
+      const sortByDisplayType = (a: any, b: any) => {
+        return (
+          Number(!a.years) - Number(!b.years) ||
+          Number(this.isSelectedDisplayType(b.displayType)) -
+            Number(this.isSelectedDisplayType(a.displayType))
+        );
+      };
+      const sortByDate = (a: any, b: any, desc: boolean) => {
+        const dateA = new Date(a.dateSent).getTime();
+        const dateB = new Date(b.dateSent).getTime();
+        return (
+          Number(!a.years) - Number(!b.years) ||
+          (desc ? dateB - dateA : dateA - dateB)
+        );
+      };
+      const sortByCompanyName = (a: any, b: any, desc: boolean) => {
+        return (
+          Number(!a.years) - Number(!b.years) ||
+          (desc
+            ? a.companyName.localeCompare(b.companyName)
+            : b.companyName.localeCompare(a.companyName))
+        );
+      };
+
+      const sortMethod = {
+        dateSent: sortByDate,
+        companyName: sortByCompanyName,
+        preferred: sortByPreferred,
+        displayType: sortByDisplayType,
+      };
+
+      return sortMethod[property as keyof typeof sortMethod];
     },
-    sortByDate(a: any, b: any, desc: boolean) {
-      const dateA = new Date(a.dateSent).getTime();
-      const dateB = new Date(b.dateSent).getTime();
-      return (
-        Number(!a.years) - Number(!b.years) ||
-        (desc ? dateB - dateA : dateA - dateB)
-      );
-    },
-    sortByCompanyName(a: any, b: any, desc: boolean) {
-      return (
-        Number(!a.years) - Number(!b.years) ||
-        (desc
-          ? a.companyName.localeCompare(b.companyName)
-          : b.companyName.localeCompare(a.companyName))
+    findRelatedRowsIndexes(row: any) {
+      return this.tableData.reduce(
+        (indexes: Array<number>, tableRow: any, index: number) => {
+          const isRelated =
+            tableRow.companyName === row.companyName &&
+            tableRow.dateSent === row.dateSent &&
+            tableRow.displayType !== (this as any).displayFilter;
+          if (isRelated) {
+            indexes.push(index);
+          }
+          return indexes;
+        },
+        []
       );
     },
   },
