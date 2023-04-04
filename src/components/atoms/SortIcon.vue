@@ -37,6 +37,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .sort-button {
+  cursor: pointer;
   &--active {
     color: var(--black);
   }

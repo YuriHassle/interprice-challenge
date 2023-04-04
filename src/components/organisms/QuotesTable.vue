@@ -247,9 +247,10 @@ export default Vue.extend({
     },
     handleDropdownClick(row: any) {
       const rowsToEvaluate = this.findRelatedRowsIndexes(row);
-      this.hiddenRows = this.hiddenRows.some((row) =>
+      const isHidden = this.hiddenRows.some((row) =>
         rowsToEvaluate.includes(row)
-      )
+      );
+      this.hiddenRows = isHidden
         ? this.hiddenRows.filter((key: number) => !rowsToEvaluate.includes(key))
         : [...this.hiddenRows, ...rowsToEvaluate];
     },
@@ -338,10 +339,19 @@ export default Vue.extend({
   }
   &__row {
     &--hidden {
-      display: none;
+      display: table-column;
+      & td {
+        max-height: 0;
+        padding: 0 0.5rem;
+        overflow: hidden;
+        border: 0;
+        transition: max-height 0.3s, padding 0.3s;
+      }
     }
   }
   &__cell {
+    transition: max-height 0.6s, padding 0.6s;
+
     &--min-value {
       background-color: var(--highlight-color);
     }
@@ -358,6 +368,7 @@ export default Vue.extend({
   }
   &__dropdown-button {
     font-size: 1.1rem;
+    cursor: pointer;
   }
 }
 </style>
