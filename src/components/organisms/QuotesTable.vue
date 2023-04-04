@@ -12,45 +12,18 @@
         <tr>
           <th>
             <span> DATE SENT </span>
-            <i
-              class="table__sort-button bi"
-              :class="[
-                {
-                  'table__sort-button--active': sortBy.property === 'dateSent',
-                },
-                {
-                  'bi-caret-down-fill':
-                    sortBy.property === 'dateSent' && sortBy.desc,
-                },
-                {
-                  'bi-caret-up-fill':
-                    (sortBy.property === 'dateSent' && !sortBy.desc) ||
-                    sortBy.property !== 'dateSent',
-                },
-              ]"
-              @click="handleSortClick('dateSent')"
+            <SortIcon
+              :sortBy="sortBy"
+              property="dateSent"
+              @handleSortClick="handleSortClick"
             />
           </th>
           <th>
             <span> COMPANY </span>
-            <i
-              class="table__sort-button bi"
-              :class="[
-                {
-                  'table__sort-button--active':
-                    sortBy.property === 'companyName',
-                },
-                {
-                  'bi-caret-down-fill':
-                    sortBy.property === 'companyName' && sortBy.desc,
-                },
-                {
-                  'bi-caret-up-fill':
-                    (sortBy.property === 'companyName' && !sortBy.desc) ||
-                    sortBy.property !== 'companyName',
-                },
-              ]"
-              @click="handleSortClick('companyName')"
+            <SortIcon
+              :sortBy="sortBy"
+              property="companyName"
+              @handleSortClick="handleSortClick"
             />
           </th>
           <th
@@ -142,6 +115,7 @@
 import Vue from 'vue';
 import { mapGetters, mapState } from 'vuex';
 import type { Quote } from '../../models/Quote';
+import SortIcon from '../atoms/SortIcon.vue';
 import { displayTypes } from '../../models/Quote';
 
 export default Vue.extend({
@@ -153,6 +127,9 @@ export default Vue.extend({
         desc: true,
       },
     };
+  },
+  components: {
+    SortIcon,
   },
   computed: {
     ...mapGetters('quotes', ['filteredQuoteItems']),
@@ -378,11 +355,6 @@ export default Vue.extend({
   }
   &__footer {
     border: 0.14rem solid var(--table-primary-color);
-  }
-  &__sort-button {
-    &--active {
-      color: var(--black);
-    }
   }
   &__dropdown-button {
     font-size: 1.1rem;
