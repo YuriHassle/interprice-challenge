@@ -34,16 +34,15 @@
           </th>
         </tr>
       </thead>
-      <tbody class="table__body table-group-divider">
+      <tbody class="table__body">
         <tr
           v-for="(row, rowIndex) in tableData"
           :key="`${row.id}-${rowIndex}`"
-          class="table__row"
           :class="{
-            'table__row--hidden': hiddenRows.includes(rowIndex),
+            'table__body--row-hidden': hiddenRows.includes(rowIndex),
           }"
         >
-          <td class="table__cell">
+          <td>
             <i
               v-if="isSelectedDisplayType(row.displayType)"
               class="table__dropdown-button bi"
@@ -63,13 +62,14 @@
             </span>
           </td>
           <td
-            class="table__cell"
             :class="[
               {
-                'table__cell--primary': isSelectedDisplayType(row.displayType),
+                'table__body--cell-primary': isSelectedDisplayType(
+                  row.displayType
+                ),
               },
               {
-                'table__cell--disabled': !row.years,
+                'table__body--cell-disabled': !row.years,
               },
             ]"
           >
@@ -80,11 +80,10 @@
             }}
           </td>
           <td
-            class="table__cell"
             v-for="(year, columnIndex) in tableSubHeaders"
             :key="`${row.id}-${columnIndex}`"
             :class="{
-              'table__cell--min-value':
+              'table__body--cell-highlight':
                 getMinValueByColumn(columnIndex) ===
                 getQuoteValue(rowIndex, columnIndex),
             }"
@@ -98,7 +97,8 @@
       </tbody>
       <tfoot class="table__footer">
         <tr>
-          <th colspan="2">Average by Spread</th>
+          <th></th>
+          <th>Average by Spread</th>
           <td
             v-for="(average, index) in tableFooter"
             :key="`${index}-${average}`"
@@ -323,23 +323,42 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .table {
+  font-size: 0.9rem;
+  text-align: center;
+
   &__head {
     & th {
-      font-size: 1rem;
       font-weight: 500;
-      text-align: center;
       color: var(--subtitle-color);
     }
-  }
-  &__body {
-    &.table-group-divider {
-      border-top-width: 0.14rem;
-      border-top-color: var(--table-primary-color);
+
+    tr:first-child {
+      & th {
+        border-bottom-width: 0;
+      }
+      & th:not(:nth-child(1)):not(:nth-child(2)) {
+        color: var(--black);
+        border-bottom: 0.1rem solid var(--table-primary-color);
+      }
+    }
+
+    & tr:last-child th {
+      border-bottom: 0.1rem solid var(--table-primary-color);
     }
   }
-  &__row {
-    &--hidden {
+
+  &__body {
+    & tr:last-child td {
+      border-bottom: 0.1rem solid var(--table-primary-color);
+    }
+
+    & td {
+      transition: max-height 0.6s, padding 0.6s;
+    }
+
+    &--row-hidden {
       display: table-column;
+
       & td {
         max-height: 0;
         padding: 0 0.5rem;
@@ -348,24 +367,25 @@ export default Vue.extend({
         transition: max-height 0.3s, padding 0.3s;
       }
     }
-  }
-  &__cell {
-    transition: max-height 0.6s, padding 0.6s;
 
-    &--min-value {
+    &--cell-highlight {
       background-color: var(--highlight-color);
     }
-    &--primary {
+
+    &--cell-primary {
       font-weight: bold;
     }
-    &--disabled {
+
+    &--cell-disabled {
       color: var(--table-cell-disabled);
       font-weight: bold;
     }
   }
+
   &__footer {
-    border: 0.14rem solid var(--table-primary-color);
+    border: 0.1rem solid var(--table-primary-color);
   }
+
   &__dropdown-button {
     font-size: 1.1rem;
     cursor: pointer;

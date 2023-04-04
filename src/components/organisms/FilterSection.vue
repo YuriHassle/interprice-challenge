@@ -86,9 +86,10 @@ export default Vue.extend({
 @import 'node_modules/bootstrap/scss/mixins';
 
 .filters {
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 
   &__button-container {
     display: flex;
