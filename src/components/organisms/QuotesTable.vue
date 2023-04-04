@@ -114,7 +114,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapState } from 'vuex';
-import type { Quote } from '../../models/Quote';
+import type { Quote, TableData } from '../../models/Quote';
 import SortIcon from '../atoms/SortIcon.vue';
 import { displayTypes } from '../../models/Quote';
 
@@ -134,9 +134,9 @@ export default Vue.extend({
   computed: {
     ...mapGetters('quotes', ['filteredQuoteItems']),
     ...mapState('quotes', ['yearsFilter', 'displayFilter']),
-    tableData(): any {
+    tableData(): TableData[] {
       const vm = this as any;
-      const tableData = [] as any;
+      const tableData = [] as TableData[];
       for (const quoteItem of vm.filteredQuoteItems) {
         const quotesGroupedByYear = {} as any;
 
@@ -164,31 +164,30 @@ export default Vue.extend({
           tableData.push({
             id: quoteItem.Id,
             dateSent: quoteItem.DateSent,
-            companyLabel: quoteItem.Company,
             companyName: quoteItem.Company,
           });
         }
       }
 
       const sortedTable = tableData
-        .sort(this.sortByProperty('displayType'))
-        .sort(this.sortByProperty('preferred'))
-        .sort((a: any, b: any) =>
+        .sort(this.sortByProperty('displayType') as any)
+        .sort(this.sortByProperty('preferred') as any)
+        .sort((a: TableData, b: TableData) =>
           this.sortByProperty(this.sortBy.property)(a, b, this.sortBy.desc)
         )
-        .sort(this.sortByProperty('validValues'));
+        .sort(this.sortByProperty('validValues') as any);
 
       console.log('tableData', sortedTable);
       return sortedTable;
     },
-    tableFooter(): any {
+    tableFooter(): Array<number> {
       const vm = this as any;
-      const tableFooter = [] as any;
+      const tableFooter = [];
       for (const columnIndex of vm.tableSubHeaders.keys()) {
         let counter = 0;
         const totalByYear = vm.tableData.reduce(
-          (sum: number, data: any, rowIndex: number) => {
-            if (this.isSelectedDisplayType(data.displayType)) {
+          (sum: number, data: TableData, rowIndex: number) => {
+            if (this.isSelectedDisplayType(data.displayType || '')) {
               const value = vm.getQuoteValue(rowIndex, columnIndex);
               if (value) {
                 sum += value;
@@ -216,11 +215,11 @@ export default Vue.extend({
   methods: {
     getMinValueByColumn(columnIndex: number): number {
       const vm = this as any;
-      const col = vm.tableSubHeaders[columnIndex];
-      const couponType = vm.getCouponType(columnIndex);
+      const col = vm.tableSubHeaders[columnIndex] as number;
+      const couponType = vm.getCouponType(columnIndex) as string;
 
       const minValue = vm.tableData.reduce(
-        (findMinValue: number, data: any) => {
+        (findMinValue: number, data: TableData) => {
           const value = data.years?.[col]?.[couponType]?.[vm.displayFilter];
           if (value) {
             findMinValue =
@@ -245,7 +244,7 @@ export default Vue.extend({
         row.displayType
       ];
     },
-    handleDropdownClick(row: any) {
+    handleDropdownClick(row: TableData) {
       const rowsToEvaluate = this.findRelatedRowsIndexes(row);
       const isHidden = this.hiddenRows.some((row) =>
         rowsToEvaluate.includes(row)
@@ -265,30 +264,30 @@ export default Vue.extend({
     },
 
     sortByProperty(property: string) {
-      const sortByPreferred = (a: any, b: any) => {
-        return b.preferred - a.preferred;
+      const sortByPreferred = (a: TableData, b: TableData) => {
+        return Number(b.preferred) - Number(a.preferred);
       };
 
-      const sortByDisplayType = (a: any, b: any) => {
+      const sortByDisplayType = (a: TableData, b: TableData) => {
         return (
-          Number(this.isSelectedDisplayType(b.displayType)) -
-          Number(this.isSelectedDisplayType(a.displayType))
+          Number(this.isSelectedDisplayType(b.displayType || '')) -
+          Number(this.isSelectedDisplayType(a.displayType || ''))
         );
       };
 
-      const sortByDate = (a: any, b: any, desc: boolean) => {
-        const dateA = new Date(a.dateSent).getTime();
-        const dateB = new Date(b.dateSent).getTime();
+      const sortByDate = (a: TableData, b: TableData, desc: boolean) => {
+        const dateA = new Date(a.dateSent || '').getTime();
+        const dateB = new Date(b.dateSent || '').getTime();
         return desc ? dateB - dateA : dateA - dateB;
       };
 
-      const sortByCompanyName = (a: any, b: any, desc: boolean) => {
+      const sortByCompanyName = (a: TableData, b: TableData, desc: boolean) => {
         return desc
           ? a.companyName.localeCompare(b.companyName)
           : b.companyName.localeCompare(a.companyName);
       };
 
-      const sortByValidValues = (a: any, b: any) => {
+      const sortByValidValues = (a: TableData, b: TableData) => {
         return Number(!a.years) - Number(!b.years);
       };
 
@@ -302,9 +301,9 @@ export default Vue.extend({
 
       return sortMethod[property as keyof typeof sortMethod];
     },
-    findRelatedRowsIndexes(row: any) {
+    findRelatedRowsIndexes(row: TableData) {
       return this.tableData.reduce(
-        (indexes: Array<number>, tableRow: any, index: number) => {
+        (indexes: Array<number>, tableRow: TableData, index: number) => {
           const isRelated =
             tableRow.companyName === row.companyName &&
             tableRow.dateSent === row.dateSent &&

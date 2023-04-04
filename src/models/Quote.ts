@@ -16,6 +16,15 @@ export interface Quote {
   '3MLSpread': number | null;
 }
 
+export interface TableData {
+  companyName: string;
+  dateSent: string | null;
+  displayType?: string;
+  id: string | null;
+  preferred?: string;
+  years?: any;
+}
+
 export type CouponType = 'FIX' | 'FRN';
 
 export const displayTypes = ['Spread', 'Yield', '3MLSpread'];
