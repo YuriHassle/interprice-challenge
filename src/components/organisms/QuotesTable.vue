@@ -181,7 +181,6 @@ export default Vue.extend({
               displayType,
               preferred: quoteItem.Preferred,
               years: { ...quotesGroupedByYear },
-              isPrimaryRow: this.isSelectedDisplayType(displayType),
             });
           });
         } else {
@@ -199,7 +198,9 @@ export default Vue.extend({
         .sort(this.sortByProperty('preferred'))
         .sort((a: any, b: any) =>
           this.sortByProperty(this.sortBy.property)(a, b, this.sortBy.desc)
-        );
+        )
+        .sort(this.sortByProperty('validValues'));
+
       console.log('tableData', sortedTable);
       return sortedTable;
     },
@@ -287,30 +288,30 @@ export default Vue.extend({
 
     sortByProperty(property: string) {
       const sortByPreferred = (a: any, b: any) => {
-        return Number(!a.years) - Number(!b.years) || b.preferred - a.preferred;
+        return b.preferred - a.preferred;
       };
+
       const sortByDisplayType = (a: any, b: any) => {
         return (
-          Number(!a.years) - Number(!b.years) ||
           Number(this.isSelectedDisplayType(b.displayType)) -
-            Number(this.isSelectedDisplayType(a.displayType))
+          Number(this.isSelectedDisplayType(a.displayType))
         );
       };
+
       const sortByDate = (a: any, b: any, desc: boolean) => {
         const dateA = new Date(a.dateSent).getTime();
         const dateB = new Date(b.dateSent).getTime();
-        return (
-          Number(!a.years) - Number(!b.years) ||
-          (desc ? dateB - dateA : dateA - dateB)
-        );
+        return desc ? dateB - dateA : dateA - dateB;
       };
+
       const sortByCompanyName = (a: any, b: any, desc: boolean) => {
-        return (
-          Number(!a.years) - Number(!b.years) ||
-          (desc
-            ? a.companyName.localeCompare(b.companyName)
-            : b.companyName.localeCompare(a.companyName))
-        );
+        return desc
+          ? a.companyName.localeCompare(b.companyName)
+          : b.companyName.localeCompare(a.companyName);
+      };
+
+      const sortByValidValues = (a: any, b: any) => {
+        return Number(!a.years) - Number(!b.years);
       };
 
       const sortMethod = {
@@ -318,6 +319,7 @@ export default Vue.extend({
         companyName: sortByCompanyName,
         preferred: sortByPreferred,
         displayType: sortByDisplayType,
+        validValues: sortByValidValues,
       };
 
       return sortMethod[property as keyof typeof sortMethod];
